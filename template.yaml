@@ -1,0 +1,27 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredlimitsrequests
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredLimitsRequests
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sresources
+
+        violation[{"msg": msg}] {
+          provided := {c | c := input.review.object.spec.template.spec.containers[_]; not startswith(c.name, "init-")}
+
+          hasMemoryLimits := count(c | c := provided[_]; c.resources.limits.memory) > 0
+          hasMemoryRequests := count(c | c := provided[_]; c.resources.requests.memory) > 0
+          hasCPURequests := count(c | c := provided[_]; c.resources.requests.cpu) > 0
+
+          not hasMemoryLimits
+          not hasMemoryRequests
+          not hasCPURequests
+
+          msg := sprintf("Main Containers %v must have CPU and Memory requests and Memory limits specified.", [provided])
+        }
