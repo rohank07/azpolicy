@@ -15,7 +15,7 @@ spec:
         violation[{"msg": msg}] {
           provided := {c | c := input.review.object.spec.template.spec.containers[_]; not startswith(c.name, "init-")}
 
-          mainContainers := {c | c := provided[_]; not (c.resources.limits.memory or c.resources.requests.memory or c.resources.requests.cpu)}
+          mainContainers := {c | c := provided[_]; not (c.resources.limits.memory | c.resources.requests.memory | c.resources.requests.cpu)}
 
           count(mainContainers) > 0
 
