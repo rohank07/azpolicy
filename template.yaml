@@ -60,15 +60,15 @@ spec:
           not input_container_excluded(container.name)
           not is_excluded(container)
           missing(container.resources.requests, "cpu")
-          msg := sprintf("container <%v> has no memory limit", [container.name])
+          msg := sprintf("container <%v> has no cpu requests", [container.name])
         }
 
         general_violation[{"msg": msg, "field": field}] {
           container := input.review.object.spec[field][_]
           not input_container_excluded(container.name)
           not is_excluded(container)
-          missing(container.resources.requests, "memory")
-          msg := sprintf("container <%v> has no cpu limit", [container.name])
+          missing(container.resources.limits, "memory")
+          msg := sprintf("container <%v> has no memory limit", [container.name])
         }
 
         input_container_excluded(field) {
