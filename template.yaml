@@ -11,10 +11,6 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           properties:
-            cpuLimit:
-              type: string
-            memoryLimit:
-              type: string
             excludedContainers:
               type: array
               items:
