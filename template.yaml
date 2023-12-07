@@ -27,8 +27,8 @@ spec:
         }
 
         general_violation[{"msg": msg, "field": field}] {
+          input.review.object.kind == "Deployment"
           container := input.review.object.spec[field][_]
-          not input_container_excluded(container.name)
           missing(container.resources.limits, "memory")
           msg := sprintf("container <%v> has no memory limit", [container.name])
         }

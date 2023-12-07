@@ -1,0 +1,37 @@
+{
+    "properties": {
+      "displayName": "Kubernetes cluster containers CPU and memory resource limits should not exceed the specified limits",
+      "policyType": "BuiltIn",
+      "mode": "Microsoft.Kubernetes.Data",
+      "description": "Enforce container CPU and memory resource limits to prevent resource exhaustion attacks in a Kubernetes cluster. This policy is generally available for Kubernetes Service (AKS), and preview for Azure Arc enabled Kubernetes. For more information, see https://aka.ms/kubepolicydoc.",
+      "metadata": {
+        "version": "9.1.0",
+        "category": "Kubernetes"
+      },
+      "version": "9.1.0",
+      "policyRule": {
+        "if": {
+          "field": "type",
+          "in": [
+            "Microsoft.Kubernetes/connectedClusters",
+            "Microsoft.ContainerService/managedClusters"
+          ]
+        },
+        "then": {
+          "effect": "[parameters('effect')]",
+          "details": {
+            "templateInfo": {
+              "sourceType": "Base64Encoded",
+              "content": "YXBpVmVyc2lvbjogdGVtcGxhdGVzLmdhdGVrZWVwZXIuc2gvdjFiZXRhMQpraW5kOiBDb25zdHJhaW50VGVtcGxhdGUKbWV0YWRhdGE6CiAgbmFtZTogazhzcmVxdWlyZWRsaW1pdHNyZXF1ZXN0cwogIGFubm90YXRpb25zOgogICAgZGVzY3JpcHRpb246IEVuZm9yY2UgY3B1IG1lbW9yeSBsaW1pdHMKc3BlYzoKICBjcmQ6CiAgICBzcGVjOgogICAgICBuYW1lczoKICAgICAgICBraW5kOiBrOHNyZXF1aXJlZGxpbWl0c3JlcXVlc3RzCiAgdGFyZ2V0czoKICAgIC0gdGFyZ2V0OiBhZG1pc3Npb24uazhzLmdhdGVrZWVwZXIuc2gKICAgICAgcmVnbzogfAogICAgICAgIHBhY2thZ2UgazhzcmVxdWlyZWRsaW1pdHNyZXF1ZXN0cwoKICAgICAgICBnZW5lcmFsX3Zpb2xhdGlvblt7Im1zZyI6IG1zZywgImZpZWxkIjogZmllbGR9XSB7CiAgICAgICAgICBpbnB1dC5yZXZpZXcub2JqZWN0LmtpbmQgPT0gIkRlcGxveW1lbnQiCiAgICAgICAgICBjb250YWluZXIgOj0gaW5wdXQucmV2aWV3Lm9iamVjdC5zcGVjW2ZpZWxkXVtfXQogICAgICAgICAgbm90IGlucHV0X2NvbnRhaW5lcl9leGNsdWRlZChjb250YWluZXIubmFtZSkKICAgICAgICAgIG5vdCBpc19leGNsdWRlZChjb250YWluZXIpCiAgICAgICAgICBub3QgY29udGFpbmVyLnJlc291cmNlcy5saW1pdHMKICAgICAgICAgIG1zZyA6PSBzcHJpbnRmKCJjb250YWluZXIgPCV2PiBoYXMgbm8gcmVzb3VyY2UgbGltaXRzIiwgW2NvbnRhaW5lci5uYW1lXSkKICAgICAgICB9Cgo="
+            },
+            "apiGroups": [
+              ""
+            ],
+            "kinds": [
+              "Deployment"
+            ]
+          }
+        }
+      }
+    }
+  }
