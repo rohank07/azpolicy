@@ -2,23 +2,33 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8srequiredlimitsrequests
+  annotations:
+    description: Enforce cpu memory limits
 spec:
   crd:
     spec:
       names:
-        kind: K8sRequiredLimitsRequests
+        kind: k8srequiredlimitsrequests
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sresources
+        package k8srequiredlimitsrequests
+
 
         violation[{"msg": msg}] {
-          provided := {c | c := input.review.object.spec.template.spec.containers[_]; not startswith(c.name, "init-")}
-
-          mainContainers := {c | c := provided[_]; not (c.resources.limits.memory | c.resources.requests.memory | c.resources.requests.cpu)}
-
-          count(mainContainers) > 0
-
-          msg := sprintf("Main Containers %v should have CPU and Memory requests and Memory limits specified, but they are not.", [mainContainers])
+          general_violation[{"msg": msg, "field": "containers"}]
         }
 
+        general_violation[{"msg": msg, "field": field}] {
+          input.review.object.kind == "Deployment"
+          container := input.review.object.spec[field][_]
+          not container.resources.limits
+          msg := sprintf("container <%v> has no resource limits", [container.name])
+        }
+
+        general_violation[{"msg": msg, "field": field}] {
+          container := input.review.object.spec[field][_]
+          not input_container_excluded(container.name)
+          missing(container.resources.limits, "memory")
+          msg := sprintf("container <%v> has no memory limit", [container.name])
+        }
