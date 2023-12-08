@@ -10,7 +10,7 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package testdeployment
+        package k8sazurev3containerlimitsrequests
 
         import data.lib.exclude_container_image.is_excluded
 
