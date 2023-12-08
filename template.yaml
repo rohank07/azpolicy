@@ -37,8 +37,26 @@ spec:
             field == "memory"
 
 
-        msg := sprintf("TEST container <%v> has no memory request", [container.name]) { request_memory_missing }
-        msg += sprintf(" TEST container <%v> has no CPU request", [container.name]) { request_cpu_missing }
-        msg += sprintf(" TEST container <%v> has no memory limit", [container.name]) { limit_memory_missing }
+        msg := sprintf("TEST container <%v> has no memory request", [container.name]); request_memory_missing
+        msg = sprintf(" TEST container <%v> has no CPU request", [container.name]); request_cpu_missing
+        msg = sprintf(" TEST container <%v> has no memory limit", [container.name]); limit_memory_missing
         }
 
+      libs:
+        - |
+          package lib.exclude_container_image
+          is_excluded(container) {
+              exclude_images := object.get(object.get(input, "parameters", {}), "excludedImages", [])
+              img := container.image
+              exclusion := exclude_images[_]
+              _matches_exclusion(img, exclusion)
+          }
+          _matches_exclusion(img, exclusion) {
+              not endswith(exclusion, "*")
+              exclusion == img
+          }
+          _matches_exclusion(img, exclusion) {
+              endswith(exclusion, "*")
+              prefix := trim_suffix(exclusion, "*")
+              startswith(img, prefix)
+          }
