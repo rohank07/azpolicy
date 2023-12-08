@@ -1,12 +1,12 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8sazurev3containerlimitsrequests
+  name: testdeployment
 spec:
   crd:
     spec:
       names:
-        kind: K8sAzureV3ContainerLimitsRequests
+        kind: TestDeployment
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
@@ -15,19 +15,10 @@ spec:
               type: array
               items:
                 type: string
-            excludedImages:
-              description: >-
-                Any container that uses an image that matches an entry in this list will be excluded
-                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
-                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
-                in order to avoid unexpectedly excluding images from an untrusted repository.
-              type: array
-              items:
-                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sazurev3containerlimits
+        package testdeployment
 
         import data.lib.exclude_container_image.is_excluded
 
