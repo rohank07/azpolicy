@@ -7,14 +7,6 @@ spec:
     spec:
       names:
         kind: TestDeployment
-      validation:
-        # Schema for the `parameters` field
-        openAPIV3Schema:
-          properties:
-            excludedContainers:
-              type: array
-              items:
-                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
@@ -30,56 +22,27 @@ spec:
           obj[field] == ""
         }
 
-        violation[{"msg": msg}] {
-          general_violation[{"msg": msg, "field": "containers"}]
-        }
-
-        violation[{"msg": msg}] {
-          general_violation[{"msg": msg, "field": "initContainers"}]
-        }
-
-        general_violation[{"msg": msg, "field": field}] {
+        violation[{"msg": msg, "field": field}] {
           container := input.review.object.spec[field][_]
           not input_container_excluded(container.name)
           not is_excluded(container)
-          missing(container.resources.requests, "memory")
-          msg := sprintf("container <%v> has no memory request", [container.name])
+
+          request_missing := missing(container.resources.requests, "memory") {
+            field == "memory"
+          } else missing(container.resources.requests, "cpu") {
+            field == "cpu"
+          }
+
+          limit_missing := missing(container.resources.limits, "memory") {
+            field == "memory"
+          } else missing(container.resources.limits, "cpu") {
+            field == "cpu"
+          }
+
+          request_or_limit_missing := request_missing or limit_missing
+          msg := sprintf("container <%v> has no %v %v", [container.name, field, if request_missing { "request" } else { "limit" }])
         }
 
-        general_violation[{"msg": msg, "field": field}] {
-          container := input.review.object.spec[field][_]
-          not input_container_excluded(container.name)
-          not is_excluded(container)
-          missing(container.resources.requests, "cpu")
-          msg := sprintf("container <%v> has no cpu requests", [container.name])
+        input_container_excluded(name) {
+          _matches_exclusion(name, input.parameters.excludedContainers[_])
         }
-
-        general_violation[{"msg": msg, "field": field}] {
-          container := input.review.object.spec[field][_]
-          not input_container_excluded(container.name)
-          not is_excluded(container)
-          missing(container.resources.limits, "memory")
-          msg := sprintf("container <%v> has no memory limit", [container.name])
-        }
-
-        input_container_excluded(field) {
-            field == input.parameters.excludedContainers[_]
-        }
-      libs:
-        - |
-          package lib.exclude_container_image
-          is_excluded(container) {
-              exclude_images := object.get(object.get(input, "parameters", {}), "excludedImages", [])
-              img := container.image
-              exclusion := exclude_images[_]
-              _matches_exclusion(img, exclusion)
-          }
-          _matches_exclusion(img, exclusion) {
-              not endswith(exclusion, "*")
-              exclusion == img
-          }
-          _matches_exclusion(img, exclusion) {
-              endswith(exclusion, "*")
-              prefix := trim_suffix(exclusion, "*")
-              startswith(img, prefix)
-          }
