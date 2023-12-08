@@ -24,25 +24,21 @@ spec:
 
         violation[{"msg": msg, "field": field}] {
           container := input.review.object.spec[field][_]
-          not input_container_excluded(container.name)
           not is_excluded(container)
 
-          request_missing := missing(container.resources.requests, "memory") {
+          request_memory_missing := missing(container.resources.requests, "memory") {
             field == "memory"
-          } else missing(container.resources.requests, "cpu") {
+          }
+          request_cpu_missing := missing(container.resources.requests, "cpu") {
             field == "cpu"
           }
 
-          limit_missing := missing(container.resources.limits, "memory") {
+          limit_memory_missing := missing(container.resources.limits, "memory") {
             field == "memory"
-          } else missing(container.resources.limits, "cpu") {
-            field == "cpu"
           }
 
-          request_or_limit_missing := request_missing or limit_missing
-          msg := sprintf("container <%v> has no %v %v", [container.name, field, if request_missing { "request" } else { "limit" }])
+          msg := sprintf("TEST container <%v> has no memory request", [container.name]) { request_memory_missing }
+          msg := sprintf("TEST container <%v> has no CPU request", [container.name]) { request_cpu_missing }
+          msg := sprintf("TEST container <%v> has no memory limit", [container.name]) { limit_memory_missing }
         }
 
-        input_container_excluded(name) {
-          _matches_exclusion(name, input.parameters.excludedContainers[_])
-        }
