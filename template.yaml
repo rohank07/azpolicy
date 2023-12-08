@@ -1,12 +1,12 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: testdeployment
+  name: k8sazurev3containerlimitsrequests
 spec:
   crd:
     spec:
       names:
-        kind: TestDeployment
+        kind: K8sAzureV3ContainerLimitsRequests
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
