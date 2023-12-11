@@ -45,7 +45,7 @@ spec:
           not input_container_excluded(container.name)
           not is_excluded(container)
           missing(container.resources.requests, "cpu")
-          msg := sprintf("TEST container <%v> has no cpu requests", [container.name])
+          msg := sprintf("container <%v> has no cpu requests", [container.name])
         }
 
         general_violation[{"msg": msg, "field": field}] {
@@ -53,7 +53,7 @@ spec:
           not input_container_excluded(container.name)
           not is_excluded(container)
           missing(container.resources.requests, "memory")
-          msg := sprintf("TEST container <%v> has no memory requests", [container.name])
+          msg := sprintf("container <%v> has no memory requests", [container.name])
         }
 
         general_violation[{"msg": msg, "field": field}] {
@@ -61,7 +61,7 @@ spec:
           not input_container_excluded(container.name)
           not is_excluded(container)
           missing(container.resources.limits, "memory")
-          msg := sprintf("TEST container <%v> has no memory limits", [container.name])
+          msg := sprintf("container <%v> has no memory limits", [container.name])
         }
 
 
